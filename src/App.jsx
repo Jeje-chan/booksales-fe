@@ -12,6 +12,10 @@ import GenreCreate from "./pages/admin/genres/create";
 import GenreList from "./pages/admin/genres";
 import AuthorList from "./pages/admin/authors";
 import AuthorCreate from "./pages/admin/authors/create"; // ⬅ pastikan ini ada
+import BookEdit from "./pages/admin/books/edit";
+import GenreEdit from "./pages/admin/genres/edit";
+import AuthorEdit from "./pages/admin/authors/edit";
+import ShowBook from "./pages/public/books/show";
 
 function App() {
     return (
@@ -20,7 +24,10 @@ function App() {
                 {/* Public Routes */}
                 <Route element={<PublicLayout />}>
                     <Route index element={<Home />} />
-                    <Route path="books" element={<Books />} />
+                    <Route path="books">
+                        <Route index element={<Books />} />
+                        <Route path="show/:id" element={<ShowBook />} /> {/* Book details page */}
+                    </Route>
                 </Route>
 
                 {/* Auth */}
@@ -34,16 +41,19 @@ function App() {
                     <Route path="books">
                         <Route index element={<AdminBooks />} />
                         <Route path="create" element={<BookCreate />} />
+                        <Route path="edit/:id" element={<BookEdit />} />
                     </Route>
 
                     <Route path="genres">
                         <Route index element={<GenreList />} />
                         <Route path="create" element={<GenreCreate />} />
+                        <Route path="edit/:id" element={<GenreEdit />} /> {/* Reuse GenreCreate for edit */}
                     </Route>
 
                     <Route path="authors">
                         <Route index element={<AuthorList />} />
                         <Route path="create" element={<AuthorCreate />} />
+                        <Route path="edit/:id" element={<AuthorEdit />} /> {/* Reuse AuthorCreate for edit */}
                     </Route>
                 </Route>
             </Routes>

@@ -1,35 +1,50 @@
 import { useEffect, useState } from "react";
-import { getAuthors } from "../../../_services/authors";
+import { getAuthors, deleteAuthor } from "../../../_services/authors"; // Import deleteAuthor
 import { Link } from "react-router-dom";
 
 export default function AuthorList() {
     const [authors, setAuthors] = useState([]);
-
     const [openDropdown, setOpenDropdown] = useState(null);
 
-    useEffect(() => {
+    // Function to fetch authors
     const fetchData = async () => {
-        const [authorsData] = await Promise.all([getAuthors()]);
-        console.log("Authors:", authorsData); // <--- Log ini
-        setAuthors(authorsData);
+        try {
+            const authorsData = await getAuthors();
+            console.log("Authors:", authorsData);
+            setAuthors(authorsData);
+        } catch (error) {
+            console.error("Error fetching authors:", error);
+            // Handle error (e.g., show a message to the user)
+            alert("Failed to load authors. Please try again.");
+        }
     };
-    fetchData();
-}, []);
 
-useEffect(() => {
-    const fetchData = async () => {
-        const [authorsData] = await Promise.all([
-            getAuthors(),
-        ]);
-        console.log("Authors:", authorsData); // cek di console
-        setAuthors(authorsData);
-    };
-    fetchData();
-}, []);
-        
+    // Use a single useEffect to fetch data on component mount
+    useEffect(() => {
+        fetchData();
+    }, []); // Empty dependency array means this runs once on mount
+
     const toggleDropdown = (id) => {
-        setOpenDropdown((openDropdown) === id ? null : id);
-    }
+        setOpenDropdown((prevOpenDropdown) =>
+            prevOpenDropdown === id ? null : id
+        );
+    };
+
+    const handleDelete = async (id) => {
+        if (window.confirm("Are you sure you want to delete this author?")) {
+            try {
+                await deleteAuthor(id);
+                // After successful deletion, refresh the list of authors
+                fetchData();
+                console.log(`Author with ID ${id} deleted successfully.`);
+                setOpenDropdown(null); // Close dropdown after deletion
+            } catch (error) {
+                console.error("Error deleting author:", error);
+                alert("Error deleting author. Please try again.");
+            }
+        }
+    };
+
     return (
         <>
             <section className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5">
@@ -164,7 +179,14 @@ useEffect(() => {
                                                             </li>
                                                         </ul>
                                                         <div className="py-1">
-                                                            <button className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+                                                            <button
+                                                                onClick={() =>
+                                                                    handleDelete(
+                                                                        author.id
+                                                                    )
+                                                                }
+                                                                className="block w-full text-left py-2 px-4 text-sm text-gray-700 hover:bg-red-600 hover:text-white dark:hover:bg-red-500 dark:text-gray-200 dark:hover:text-white"
+                                                            >
                                                                 Delete
                                                             </button>
                                                         </div>
@@ -176,7 +198,7 @@ useEffect(() => {
                                 ) : (
                                     <tr>
                                         <td
-                                            colSpan={7}
+                                            colSpan={3}
                                             className="text-center py-4"
                                         >
                                             Data tidak ditemukan
@@ -289,7 +311,5 @@ useEffect(() => {
                 </div>
             </section>
         </>
-    )
+    );
 }
-
-    

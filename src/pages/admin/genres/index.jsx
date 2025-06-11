@@ -1,35 +1,48 @@
 import { useEffect, useState } from "react";
-import { getGenres } from "../../../_services/genres";
+import { getGenres, deleteGenre } from "../../../_services/genres"; // Import deleteGenre
 import { Link } from "react-router-dom";
 
 export default function GenreList() {
     const [genres, setGenres] = useState([]);
-
     const [openDropdown, setOpenDropdown] = useState(null);
 
-    useEffect(() => {
+    // Function to fetch genres
     const fetchData = async () => {
-        const [genresData] = await Promise.all([getGenres()]);
-        console.log("Genres:", genresData); // <--- Log ini
-        setGenres(genresData);
+        try {
+            const genresData = await getGenres();
+            console.log("Genres:", genresData);
+            setGenres(genresData);
+        } catch (error) {
+            console.error("Error fetching genres:", error);
+            // Handle error (e.g., show a message to the user)
+        }
     };
-    fetchData();
-}, []);
 
-useEffect(() => {
-    const fetchData = async () => {
-        const [genresData] = await Promise.all([
-            getGenres(),
-        ]);
-        console.log("Genres:", genresData); // cek di console
-        setGenres(genresData);
-    };
-    fetchData();
-}, []);
-        
+    useEffect(() => {
+        fetchData();
+    }, []); // Empty dependency array means this runs once on mount
+
     const toggleDropdown = (id) => {
-        setOpenDropdown((openDropdown) === id ? null : id);
-    }
+        setOpenDropdown((prevOpenDropdown) =>
+            prevOpenDropdown === id ? null : id
+        );
+    };
+
+    const handleDelete = async (id) => {
+        if (window.confirm("Are you sure you want to delete this genre?")) {
+            try {
+                await deleteGenre(id);
+                // After successful deletion, refresh the list of genres
+                fetchData();
+                console.log(`Genre with ID ${id} deleted successfully.`);
+                setOpenDropdown(null); // Close dropdown after deletion
+            } catch (error) {
+                console.error("Error deleting genre:", error);
+                // Handle error (e.g., show a message to the user)
+            }
+        }
+    };
+
     return (
         <>
             <section className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5">
@@ -164,7 +177,15 @@ useEffect(() => {
                                                             </li>
                                                         </ul>
                                                         <div className="py-1">
-                                                            <button className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
+                                                            <button
+                                                                onClick={() =>
+                                                                    handleDelete(
+                                                                        genre.id
+                                                                    )
+                                                                }
+                                                                // Reverted styling to original gray text and hover
+                                                                className="block w-full text-left py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                                                            >
                                                                 Delete
                                                             </button>
                                                         </div>
@@ -176,7 +197,7 @@ useEffect(() => {
                                 ) : (
                                     <tr>
                                         <td
-                                            colSpan={7}
+                                            colSpan={3}
                                             className="text-center py-4"
                                         >
                                             Data tidak ditemukan
@@ -289,7 +310,5 @@ useEffect(() => {
                 </div>
             </section>
         </>
-    )
+    );
 }
-
-    
