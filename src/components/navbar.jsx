@@ -7,12 +7,19 @@ export default function Navbar() {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
     const handleLogout = async () => {
-        if (token) {
-            await logout({ token });
-            localStorage.removeItem("userInfo")
+        try {
+            if (token) {
+                await logout({ token });
+            }
+        } catch (error) {
+            console.log(error);
+            throw error
+        } finally {
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("userInfo");
+            navigate("/login");
         }
-        navigate("/login");
-    }
+    };
 
     return (
         <>

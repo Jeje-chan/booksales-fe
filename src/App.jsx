@@ -16,6 +16,8 @@ import BookEdit from "./pages/admin/books/edit";
 import GenreEdit from "./pages/admin/genres/edit";
 import AuthorEdit from "./pages/admin/authors/edit";
 import ShowBook from "./pages/public/books/show";
+import Unauthorized from "./pages/auth/unauthorized";
+import ProtectedRoute from "./components/protectedRoute";
 
 function App() {
     return (
@@ -33,27 +35,32 @@ function App() {
                 {/* Auth */}
                 <Route path="login" element={<Login />} />
                 <Route path="register" element={<Register />} />
+                <Route path="unauthorized" element={<Unauthorized />} />
 
                 {/* Admin */}
-                <Route path="admin" element={<AdminLayout />}>
+                <Route
+                    path="admin"
+                    element={
+                        <ProtectedRoute allowedRoles={["admin"]}>
+                            <AdminLayout />
+                        </ProtectedRoute>
+                    }
+                >
                     <Route index element={<Dashboard />} />
-                    
                     <Route path="books">
                         <Route index element={<AdminBooks />} />
                         <Route path="create" element={<BookCreate />} />
                         <Route path="edit/:id" element={<BookEdit />} />
                     </Route>
-
                     <Route path="genres">
                         <Route index element={<GenreList />} />
                         <Route path="create" element={<GenreCreate />} />
-                        <Route path="edit/:id" element={<GenreEdit />} /> {/* Reuse GenreCreate for edit */}
+                        <Route path="edit/:id" element={<GenreEdit />} />
                     </Route>
-
                     <Route path="authors">
                         <Route index element={<AuthorList />} />
                         <Route path="create" element={<AuthorCreate />} />
-                        <Route path="edit/:id" element={<AuthorEdit />} /> {/* Reuse AuthorCreate for edit */}
+                        <Route path="edit/:id" element={<AuthorEdit />} />
                     </Route>
                 </Route>
             </Routes>
