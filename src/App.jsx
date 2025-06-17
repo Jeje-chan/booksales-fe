@@ -18,6 +18,9 @@ import AuthorEdit from "./pages/admin/authors/edit";
 import ShowBook from "./pages/public/books/show";
 import Unauthorized from "./pages/auth/unauthorized";
 import ProtectedRoute from "./components/protectedRoute";
+import Cart from "./pages/Cart";
+import ChatAdmin from "./pages/ContactAdmin";
+import AboutUs from "./pages/AboutUs";
 
 function App() {
     return (
@@ -31,6 +34,10 @@ function App() {
                         <Route path="show/:id" element={<ShowBook />} /> {/* Book details page */}
                     </Route>
                 </Route>
+
+                <Route path="about" element={<AboutUs />} />
+                <Route path="/chat-admin" element={<ChatAdmin />} />
+                <Route path="/cart" element={<Cart />} />
 
                 {/* Auth */}
                 <Route path="login" element={<Login />} />
